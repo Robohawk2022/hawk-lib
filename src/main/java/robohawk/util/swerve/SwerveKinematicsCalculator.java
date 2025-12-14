@@ -1,4 +1,4 @@
-package robohawk.swerve;
+package robohawk.util.swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;

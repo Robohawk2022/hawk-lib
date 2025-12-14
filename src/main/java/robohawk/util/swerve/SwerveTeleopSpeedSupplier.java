@@ -1,4 +1,4 @@
-package robohawk.swerve;
+package robohawk.util.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -7,6 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import robohawk.swerve.SwerveTeleopConfig;
 import robohawk.util.Utils;
 
 import java.util.Objects;

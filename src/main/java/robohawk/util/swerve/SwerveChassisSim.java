@@ -1,4 +1,4 @@
-package robohawk.swerve;
+package robohawk.util.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;

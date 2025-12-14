@@ -4,6 +4,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import robohawk.util.Utils;
+import robohawk.util.swerve.SwerveTeleopSpeedSupplier;
 
 import java.util.Objects;
 import java.util.function.Consumer;
