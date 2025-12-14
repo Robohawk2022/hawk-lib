@@ -1,4 +1,4 @@
-package robohawks;
+package robohawk;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
