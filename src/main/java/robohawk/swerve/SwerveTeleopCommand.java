@@ -17,30 +17,25 @@ import java.util.function.Supplier;
  */
 public class SwerveTeleopCommand extends Command {
 
-    final SwerveTeleopConfig config;
     final Consumer<ChassisSpeeds> driveFunction;
     final Supplier<ChassisSpeeds> speedSupplier;
 
     /**
      * Creates a {@link SwerveTeleopCommand}
      *
-     * @param config configuration (required)
      * @param subsystem subsystem controlling the drive (required)
      * @param driveFunction method to accept robot-relative speeds (required)
      * @param speedSupplier speed supplier (required)
      * @throws IllegalArgumentException if required parameters are null
      */
-    public SwerveTeleopCommand(SwerveTeleopConfig config,
-                               Subsystem subsystem,
+    public SwerveTeleopCommand(Subsystem subsystem,
                                Consumer<ChassisSpeeds> driveFunction,
                                Supplier<ChassisSpeeds> speedSupplier) {
 
-        Objects.requireNonNull(config);
         Objects.requireNonNull(subsystem);
         Objects.requireNonNull(driveFunction);
         Objects.requireNonNull(speedSupplier);
 
-        this.config = config;
         this.driveFunction = driveFunction;
         this.speedSupplier = speedSupplier;
 
