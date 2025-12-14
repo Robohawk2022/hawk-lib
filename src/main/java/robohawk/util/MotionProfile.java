@@ -91,7 +91,7 @@ public class MotionProfile {
     // =============================================================
 
     /**
-     * Resets the motion parameters. This assumes the starting velocity is 0,
+     * Resets the motion bounds. This assumes the starting velocity is 0,
      * and the final velocity is 0.
      *
      * @param startPosition starting position in units
@@ -102,7 +102,7 @@ public class MotionProfile {
     }
 
     /**
-     * Resets the motion parameters. This assumes the final velocity is 0.
+     * Resets the motion bounds. This assumes the final velocity is 0.
      *
      * @param startPosition starting position in units
      * @param startVelocity starting velocity in units per second
