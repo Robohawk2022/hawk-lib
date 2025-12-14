@@ -3,7 +3,8 @@ package robohawk.util;
 /**
  * <p>Provides a one-dimensional "motion profile" - calculates position and
  * velocity over time respecting constraints on velocity, acceleration and
- * ramp time.</p>
+ * ramp time. Units don't matter as long as they are consistent between
+ * position and velocity.</p>
  *
  * <p>In the degenerate case where the ramp time is 0, this is essentially the
  * same as the {@link edu.wpi.first.math.trajectory.TrapezoidProfile}. When
@@ -19,19 +20,19 @@ public class MotionProfile {
     public record State(double position, double velocity, double acceleration) { }
 
     // Constraints on motion
-    private double maxVelocity = Double.NaN;
-    private double maxAcceleration = Double.NaN;
-    private double rampTime = Double.NaN;
+    final double maxVelocity;
+    final double maxAcceleration;
+    final double rampTime;
 
-    // Parameters for an individual motion
-    private double startPosition = Double.NaN;
-    private double startVelocity = Double.NaN;
-    private double finalPosition = Double.NaN;
+    // Motion parameters
+    final double startPosition;
+    final double startVelocity;
+    final double finalPosition;
 
     // Calculated profile timing
-    private double totalTime = Double.NaN;
-    private double actualMaxVelocity = Double.NaN;
-    private boolean isReversed = false;
+    double totalTime = Double.NaN;
+    double actualMaxVelocity = Double.NaN;
+    boolean isReversed = false;
 
     // Phase timing (for S-curve profile with up to 7 phases)
     private double t1;  // End of initial jerk phase (acceleration ramp up)
@@ -42,74 +43,26 @@ public class MotionProfile {
     private double t6;  // End of constant deceleration phase
     private double t7;  // End of jerk phase (deceleration ramp down) - total time
 
-    // =============================================================
-    // CONSTRAINTS
-    // =============================================================
-
     /**
-     * Resets the constraints for this profile. This will default the ramp
-     * time to 0 seconds, which implies a trapezoidal motion profile.
+     * Creates a new {@link MotionProfile}
      *
      * @param maxVelocity maximum velocity in units per second
      * @param maxAcceleration maximum acceleration in units per second squared
-     * @throws IllegalArgumentException if velocity is &lt;= 0
-     * @throws IllegalArgumentException if acceleration is &lt;= 0
+     * @param rampTime time in seconds to max acceleration
+     * @param startPosition start position in units
+     * @param startVelocity start velocity in units per second
+     * @param finalPosition final position in units
      */
-    public void resetConstraints(double maxVelocity, double maxAcceleration) {
-        resetConstraints(maxVelocity, maxAcceleration, 0.0);
-    }
-
-    /**
-     * Resets the constraints for this profile.
-     *
-     * @param maxVelocity maximum velocity in units per second
-     * @param maxAcceleration maximum acceleration in units per second squared
-     * @param rampTime time in seconds to reach maximum acceleration
-     * @throws IllegalArgumentException if velocity is &lt;= 0
-     * @throws IllegalArgumentException if acceleration is &lt;= 0
-     * @throws IllegalArgumentException if ramp time is &lt; 0
-     */
-    public void resetConstraints(double maxVelocity, double maxAcceleration, double rampTime) {
-
-        if (maxVelocity <= 0) {
-            throw new IllegalArgumentException("maxVelocity must be positive");
-        }
-        if (maxAcceleration <= 0) {
-            throw new IllegalArgumentException("maxAcceleration must be positive");
-        }
-        if (rampTime < 0) {
-            throw new IllegalArgumentException("rampTime must be non-negative");
-        }
+    public MotionProfile(double maxVelocity,
+                         double maxAcceleration,
+                         double rampTime,
+                         double startPosition,
+                         double startVelocity,
+                         double finalPosition) {
 
         this.maxVelocity = maxVelocity;
         this.maxAcceleration = maxAcceleration;
         this.rampTime = rampTime;
-    }
-
-    // =============================================================
-    // PARAMETERS & CALCULATION
-    // =============================================================
-
-    /**
-     * Resets the motion bounds. This assumes the starting velocity is 0,
-     * and the final velocity is 0.
-     *
-     * @param startPosition starting position in units
-     * @param finalPosition final position in units
-     */
-    public void resetMotion(double startPosition, double finalPosition) {
-        resetMotion(startPosition, 0.0, finalPosition);
-    }
-
-    /**
-     * Resets the motion bounds. This assumes the final velocity is 0.
-     *
-     * @param startPosition starting position in units
-     * @param startVelocity starting velocity in units per second
-     * @param finalPosition final position in units
-     */
-    public void resetMotion(double startPosition, double startVelocity, double finalPosition) {
-
         this.startPosition = startPosition;
         this.startVelocity = startVelocity;
         this.finalPosition = finalPosition;
@@ -130,6 +83,7 @@ public class MotionProfile {
         } else {
             calculateSCurveProfile(distance, initialVelocity);
         }
+
     }
 
     /*
