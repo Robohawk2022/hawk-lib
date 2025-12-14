@@ -1,0 +1,19 @@
+{
+  "fileName": "hawk-lib.json",
+  "name": "hawk-lib",
+  "version": "1.0.0",
+  "uuid": "a8c8e5d1-3f4c-4a9b-8e7d-2c1f5a6b9d3e",
+  "mavenUrls": [
+    "https://jitpack.io"
+  ],
+  "jsonUrl": "https://raw.githubusercontent.com/Robohawk2022/hawk-lib/main/hawk-lib.json",
+  "javaDependencies": [
+    {
+      "groupId": "com.github.Robohawk2022",
+      "artifactId": "hawk-lib",
+      "version": "1.0.0"
+    }
+  ],
+  "jniDependencies": [],
+  "cppDependencies": []
+}

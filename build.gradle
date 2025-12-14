@@ -1,0 +1,59 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'edu.wpi.first.GradleRIO' version '2025.3.2'
+}
+
+group = 'com.github.Robohawk2022'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = 'https://frcmaven.wpi.edu/artifactory/release/'
+    }
+}
+
+dependencies {
+//    implementation 'edu.wpi.first.wpilibj:wpilibj-java:2024.3.2'
+//    implementation 'edu.wpi.first.wpiutil:wpiutil-java:2024.3.2'
+//    implementation 'edu.wpi.first.wpimath:wpimath-java:2024.3.2'
+    implementation wpi.java.deps.wpilib()
+    implementation wpi.java.vendor.java()
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+    withSourcesJar()
+    withJavadocJar()
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.Robohawk2022'
+            artifactId = 'hawk-lib'
+            version = '1.0.0'
+            artifact jar
+            pom {
+                name = 'Team Robohawk Library'
+                description = 'Utilities for FRC robotics programming'
+                url = 'https://github.com/Robohawk2022/hawk-lib'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://opensource.org/licenses/MIT'
+                    }
+                }
+            }
+        }
+    }
+}
