@@ -32,6 +32,10 @@ java {
     withJavadocJar()
 }
 
+javadoc {
+    exclude '**/LimelightHelpers.java'
+}
+
 test {
     useJUnitPlatform()
 }

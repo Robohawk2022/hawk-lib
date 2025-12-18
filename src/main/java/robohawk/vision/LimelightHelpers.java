@@ -1,4 +1,4 @@
-package robohawk.util.vision;
+package robohawk.vision;
 
 // ===========================================================================================
 // THIS CLASS WAS COPIED VERBATIM FROM HERE
@@ -20,8 +20,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -237,6 +235,35 @@ public class LimelightHelpers {
         return getLimelightNTDouble(limelightName, "ta");
     }
 
+    public static double getTV(String limelightName) {
+        return getLimelightNTDouble(limelightName, "tc");
+    }
+
+    public static double getCurrentPipelineIndex(String limelightName) {
+        return getLimelightNTDouble(limelightName, "getpipe");
+    }
+
+    /**
+     * Gets the current pipeline type.
+     * @param limelightName Name of the Limelight camera
+     * @return Pipeline type string (e.g. "retro", "apriltag", etc)
+     */
+    public static String getCurrentPipelineType(String limelightName) {
+        return getLimelightNTString(limelightName, "getpipetype");
+    }
+
+    public static String getLimelightNTString(String tableName, String entryName) {
+        return getLimelightNTTableEntry(tableName, entryName).getString("");
+    }
+
+    public static void setPipelineIndex(String limelightName, int pipelineIndex) {
+        setLimelightNTDouble(limelightName, "pipeline", pipelineIndex);
+    }
+
+    public static void setLimelightNTDouble(String tableName, String entryName, double val) {
+        getLimelightNTTableEntry(tableName, entryName).setDouble(val);
+    }
+
     /**
      * Switch to getBotPose
      *
@@ -257,6 +284,14 @@ public class LimelightHelpers {
     @Deprecated
     public static double[] getBotpose_wpiRed(String limelightName) {
         return getLimelightNTDoubleArray(limelightName, "botpose_wpired");
+    }
+
+    public static double getLEDMode(String limelightName) {
+        return getLimelightNTDouble(limelightName, "ledMode");
+    }
+
+    public static void setLEDMode(String limelightName, int mode) {
+        setLimelightNTDouble(limelightName, "ledMode", mode);
     }
 
     /**

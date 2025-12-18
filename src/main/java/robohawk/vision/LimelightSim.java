@@ -1,4 +1,4 @@
-package robohawk.util.vision;
+package robohawk.vision;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -10,7 +10,7 @@ import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import robohawk.util.Utils;
+import robohawk.util.HawkUtils;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -29,7 +29,6 @@ import java.util.function.Supplier;
  *     "error offset")</li>
  *
  * </ul>
- *
  * The three configuration properties (detection FOV and distance, and pose
  * estimation error) can be controlled via SmartDashboard.
  */
@@ -78,7 +77,6 @@ public class LimelightSim {
 
     /**
      * Creates a {@link LimelightSim}
-     *
      * @param poseSupplier supplies the robot's current pose (required)
      * @param limelightName the name for the limelight
      * @throws IllegalArgumentException if required parameters are null
@@ -123,12 +121,12 @@ public class LimelightSim {
 
         // this goes through all the AprilTags and determines which one is
         // the closest which is "in view" of the camera
-        for (AprilTag thisTag : Utils.getFieldLayout().getTags()) {
+        for (AprilTag thisTag : HawkUtils.getFieldLayout().getTags()) {
 
             // basic distance check - if it's too far away (or farther away
             // than the current closest tag) we ignore it
             Pose2d thisPose = thisTag.pose.toPose2d();
-            double thisDistance = Utils.feetBetween(currentPose, thisPose);
+            double thisDistance = HawkUtils.feetBetween(currentPose, thisPose);
             if (thisDistance > detectionDistance || thisDistance > tagDistance) {
                 continue;
             }

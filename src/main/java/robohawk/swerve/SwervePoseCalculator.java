@@ -1,4 +1,4 @@
-package robohawk.util.swerve;
+package robohawk.swerve;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -9,17 +9,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import robohawk.util.Utils;
+import robohawk.util.HawkUtils;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * Implements the logic for "fusing" both odometry and vision-based pose
+ * <p>Implements the logic for "fusing" both odometry and vision-based pose
  * estimation. Also publishes poses to the dashboard, so you can visualize
  * them using AdvantageScope, and allows you to reset the current pose. See
  * the <a href="https://docs.wpilib.org/en/stable/docs/software/advanced-controls/state-space/state-space-pose-estimators.html">WPILib
- * docs</a> for more background on fused estimates.
+ * docs</a> for more background on fused estimates.</p>
  */
 public class SwervePoseCalculator {
 
@@ -48,8 +48,7 @@ public class SwervePoseCalculator {
     double latestVisionTimestamp;
 
     /**
-     * Creates a {@link SwervePoseCalculator}.
-     *
+     * Creates a {@link SwervePoseCalculator}
      * @param kinematics the chassis kinematics (required)
      * @param headingGetter a getter for the robot heading (required)
      * @param modulePositionGetter a getter for module positions (required)
@@ -82,7 +81,7 @@ public class SwervePoseCalculator {
                 headingGetter.get(),
                 modulePositionGetter.get(),
                 initialPose);
-        this.latestVisionPose = Utils.NAN_POSE;
+        this.latestVisionPose = HawkUtils.NAN_POSE;
         this.latestOdometryPose = initialPose;
         this.latestFusedPose = initialPose;
         this.latestVisionTimestamp = Double.NaN;
@@ -90,6 +89,8 @@ public class SwervePoseCalculator {
     }
 
     /**
+     * Returns the most recently-computed pose estimate of the specified
+     * type (as calculated by {@link #updateLatestPoseEstimates(boolean)}
      * @param type a pose type
      * @return the latest pose estimate of the specified type (this will never
      * be null, but may have NaNs if it's the vision pose and no vision
@@ -112,14 +113,13 @@ public class SwervePoseCalculator {
      *     <li>{@link SwerveDrivePoseEstimator#setVisionMeasurementStdDevs(Matrix)}</li>
      *     <li>{@link SwerveDrivePoseEstimator#addVisionMeasurement(Pose2d,double)}</li>
      * </ul>
-     *
      * @param pose the pose from the vision system
      * @param timestamp the timestamp of the vision measurement in seconds
      * @param stdDevs standard deviations of the vision measurements
      */
     public void addVisionEstimate(Pose2d pose, double timestamp, Matrix<N3,N1> stdDevs) {
         if (pose == null) {
-            latestVisionPose = Utils.NAN_POSE;
+            latestVisionPose = HawkUtils.NAN_POSE;
             latestVisionTimestamp = Double.NaN;
         } else {
             estimator.setVisionMeasurementStdDevs(stdDevs);
@@ -131,7 +131,6 @@ public class SwervePoseCalculator {
 
     /**
      * Reset the pose of the robot to the specified value
-     *
      * @param newPose the new pose of the robot
      */
     public void resetPose(Pose2d newPose) {
@@ -153,12 +152,13 @@ public class SwervePoseCalculator {
      * Recalculates and publishes the latest pose estimates. You should call
      * this from a <code>periodic</code> method so you have access to the most
      * recent estimates.
-     *
-     * @param useGyroHeading true if we should ignore the fused heading
-     *                       estimate (we've found that Limelight heading
-     *                       estimates can be wacky, so we usually use this)
+     * @param overrideFusedHeading true if we should replace the heading
+     *                             component of the fused estimate with the
+     *                             heading from pure odometry (we've found that
+     *                             Limelight heading estimates can be jittery,
+     *                             so we usually use this)
      */
-    public void updateLatestPoseEstimates(boolean useGyroHeading) {
+    public void updateLatestPoseEstimates(boolean overrideFusedHeading) {
 
         Rotation2d latestHeading = headingGetter.get();
         SwerveModulePosition [] latestPositions = modulePositionGetter.get();
@@ -174,7 +174,7 @@ public class SwervePoseCalculator {
         // it may not be a good idea to trust the vision-based heading
         // estimate (the gyro is usually pretty accurate), so this may
         // wind up "overriding" it with the gyro heading from odometry
-        if (!useGyroHeading) {
+        if (overrideFusedHeading) {
             latestFusedPose = new Pose2d(
                     latestFusedPose.getX(),
                     latestFusedPose.getY(),
@@ -182,8 +182,8 @@ public class SwervePoseCalculator {
         }
 
         // publish them as structs so we can see them in advantage scope
-        Utils.publishPose("FusedPose", latestFusedPose);
-        Utils.publishPose("OdometryPose", latestOdometryPose);
-        Utils.publishPose("VisionPose", latestVisionPose);
+        HawkUtils.publishPose("FusedPose", latestFusedPose);
+        HawkUtils.publishPose("OdometryPose", latestOdometryPose);
+        HawkUtils.publishPose("VisionPose", latestVisionPose);
     }
 }

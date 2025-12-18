@@ -1,4 +1,4 @@
-package robohawk.util.swerve;
+package robohawk.swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,9 +13,26 @@ import java.util.function.Supplier;
 
 /**
  * Converts {@link ChassisSpeeds} into {@link SwerveModuleState}s that will
- * move the robot in the desired manner. Implements optimization and cosine
- * compensation, as well as being able to rotate around a custom point. See
- * the <a href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">WPILib
+ * move the robot in the desired manner. Implements the following features:
+ * <ul>
+ *
+ *     <li>Desaturation scales speeds down so no single wheel is ever turning
+ *     faster than the absolute maximum speed (but keep the ratio of
+ *     speeds the same so we go in the desired direction)</li>
+ *
+ *     <li>Optimization minimizes the amount of turning each wheel has to do
+ *     by reversing the wheel direction if it means less turning</li>
+ *
+ *     <li>Cosine compensation reduces the speed of the wheel if it's not yet
+ *     pointing in the desired direction, to reduce the amount of "skew"
+ *     when changing directions</li>
+ *
+ *     <li>Movement around a custom center of rotation (this allows your
+ *     robot to "orbit" a fixed point such as a target on the field)</li>
+ *
+ * </ul>
+ *
+ * See the <a href="https://docs.wpilib.org/en/stable/docs/software/kinematics-and-odometry/swerve-drive-kinematics.html">WPILib
  * docs</a> for more background on kinematics.
  */
 public class SwerveKinematicsCalculator {
@@ -27,7 +44,6 @@ public class SwerveKinematicsCalculator {
 
     /**
      * Creates a {@link SwerveKinematicsCalculator}
-     *
      * @param kinematics the chassis kinematics (required)
      * @param modulePositionGetter a getter for module positions (required)
      * @param maximumWheelSpeed a getter for maximum wheel speed
@@ -58,41 +74,44 @@ public class SwerveKinematicsCalculator {
 
     /**
      * @param speeds the desired chassis speeds
+     * @return the required swerve module states, calculated with the center
+     * of the robot as the center of rotation
+     */
+    public SwerveModuleState [] calculateStates(ChassisSpeeds speeds) {
+        return calculateStates(speeds, Translation2d.kZero);
+    }
+
+    /**
+     * @param speeds the desired chassis speeds
      * @param centerOfRotation the center of rotation (null means center of robot)
-     * @return the required swerve module states
+     * @return the required swerve module states, calculated with the supplied
+     * center of rotation
      */
     public SwerveModuleState [] calculateStates(ChassisSpeeds speeds,
                                                 Translation2d centerOfRotation) {
 
-        // if no center of rotation is supplied, we will assume it's just
-        // the center of the robot
+        // no center of rotation? assume it's the center of the robot
         if (centerOfRotation == null) {
             centerOfRotation = Translation2d.kZero;
         }
 
-        // perform the normal kinematic calculations to determine the desired
-        // speed and angle for each module
+        // normal kinematic calculations
         SwerveModuleState [] states = kinematics.toSwerveModuleStates(
                 speeds,
                 centerOfRotation);
 
-        // this will scale speeds down so no single wheel is ever turning
-        // faster than the absolute maximum speed (but keep the ratio of
-        // speeds the same so we go in the desired direction)
+        // desaturate
         SwerveDriveKinematics.desaturateWheelSpeeds(states,
                 maximumWheelSpeed.getAsDouble());
 
         SwerveModulePosition [] positions = modulePositionGetter.get();
 
-        // optimization minimizes the amount of turning each wheel has to do
-        // by reversing the wheel direction if it means less turning
+        // optimize
         for (int i=0; i<states.length; i++) {
             states[i].optimize(positions[i].angle);
         }
 
-        // cosine compensation reduces the speed of the wheel if it's not yet
-        // pointing in the desired direction, to reduce the amount of "skew"
-        // when changing directions
+        // cosine compensation
         if (useCosineCompensation.getAsBoolean()) {
             for (int i=0; i<states.length; i++) {
                 states[i].speedMetersPerSecond *= states[i].angle

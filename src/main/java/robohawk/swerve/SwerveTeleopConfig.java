@@ -1,14 +1,13 @@
-package robohawk.util.swerve;
+package robohawk.swerve;
 
-import robohawk.util.Utils;
+import robohawk.util.HawkUtils;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 /**
- * Managed configuration properties for swerve teleop. Properties are
- * managed with {@link edu.wpi.first.wpilibj.Preferences}, which means the
- * following:
+ * Configuration properties for swerve teleop. Properties are managed with
+ * {@link edu.wpi.first.wpilibj.Preferences}, which means the following:
  * <ul>
  *
  *     <li>The current value is exposed via a {@link DoubleSupplier} so it
@@ -19,20 +18,6 @@ import java.util.function.DoubleSupplier;
  *     someone has changed them on the RoboRIO the updated value will be
  *     used instead.</li>
  *
- * </ul>
- *
- * Property names are as follows:
- * <ul>
- *     <li><pre>${prefix}/Deadband</pre></li>
- *     <li><pre>${prefix}/Exponent</pre></li>
- *     <li><pre>${prefix}/MaxFeetPerSec</pre></li>
- *     <li><pre>${prefix}/MaxDegreesPerSec</pre></li>
- *     <li><pre>${prefix}/TurboFactor</pre></li>
- *     <li><pre>${prefix}/SniperFactor</pre></li>
- *     <li><pre>${prefix}/ApplySniperToRotate?</pre></li>
- *     <li><pre>${prefix}/ApplySlew?</pre></li>
- *     <li><pre>${prefix}/SlewRate</pre></li>
- *     <li><pre>${prefix}/DriverRelative?</pre></li>
  * </ul>
  */
 public class SwerveTeleopConfig {
@@ -104,7 +89,22 @@ public class SwerveTeleopConfig {
     }
 
     /**
-     * Builder class for configuration
+     * Builder class for configuration. Defaults are based on multi-year
+     * experience and preferences of Team 3373. Upon constructing the
+     * {@link SwerveTeleopConfig}, preferences will be registered with the
+     * following names:
+     * <ul>
+     *     <li><pre>${prefix}/Deadband</pre> - default 0.1</li>
+     *     <li><pre>${prefix}/Exponent</pre> - default 2.0</li>
+     *     <li><pre>${prefix}/MaxFeetPerSec</pre> - default 10.0</li>
+     *     <li><pre>${prefix}/MaxDegreesPerSec</pre> - default 360.0</li>
+     *     <li><pre>${prefix}/TurboFactor</pre> - default 2.0</li>
+     *     <li><pre>${prefix}/SniperFactor</pre> - default 0.5</li>
+     *     <li><pre>${prefix}/ApplySniperToRotate?</pre> - default false</li>
+     *     <li><pre>${prefix}/ApplySlew?</pre> - default false</li>
+     *     <li><pre>${prefix}/SlewRate</pre> - default 1.0</li>
+     *     <li><pre>${prefix}/DriverRelative?</pre> - default true</li>
+     * </ul>
      */
     public static class Builder {
 
@@ -152,8 +152,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param maxTranslateSpeed default value for max translate speed, in
-         *                         feet per second (will be overridden by the
-         *                         corresponding preference if it already
+         *                          feet per second (will be overridden by the
+         *                          corresponding preference if it already
          *                          exists)
          * @return this builder
          */
@@ -164,9 +164,9 @@ public class SwerveTeleopConfig {
 
         /**
          * @param maxRotateSpeed default value for max rotation speed, in
-         *                         degrees per second (will be overridden by
-         *                         the corresponding preference if it already
-         *                         exists)
+         *                       degrees per second (will be overridden by
+         *                       the corresponding preference if it already
+         *                       exists)
          * @return this builder
          */
         public Builder withDefaultMaxRotateSpeed(double maxRotateSpeed) {
@@ -176,8 +176,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param turboFactor default turbo factor (will be overridden by the
-         *                         corresponding preference if it already
-         *                          exists)
+         *                    corresponding preference if it already
+         *                    exists)
          * @return this builder
          */
         public Builder withDefaultTurboFactor(double turboFactor) {
@@ -187,8 +187,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param sniperFactor default sniper factor (will be overridden by the
-         *                         corresponding preference if it already
-         *                          exists)
+         *                     corresponding preference if it already
+         *                     exists)
          * @return this builder
          */
         public Builder withDefaultSniperFactor(double sniperFactor) {
@@ -198,8 +198,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param slewRate default slew rate (will be overridden by the
-         *                         corresponding preference if it already
-         *                          exists)
+         *                 corresponding preference if it already
+         *                 exists)
          * @return this builder
          */
         public Builder withDefaultSlewRate(double slewRate) {
@@ -209,8 +209,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param driverRelative default value (will be overridden by the
-         *                         corresponding preference if it already
-         *                          exists)
+         *                       corresponding preference if it already
+         *                       exists)
          * @return this builder
          */
         public Builder withDefaultDriverRelative(boolean driverRelative) {
@@ -220,8 +220,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param applySlew default value (will be overridden by the
-         *                         corresponding preference if it already
-         *                          exists)
+         *                  corresponding preference if it already
+         *                  exists)
          * @return this builder
          */
         public Builder withDefaultApplySlew(boolean applySlew) {
@@ -232,8 +232,8 @@ public class SwerveTeleopConfig {
 
         /**
          * @param applySniperToRotate default value (will be overridden by the
-         *                         corresponding preference if it already
-         *                          exists)
+         *                            corresponding preference if it already
+         *                            exists)
          * @return this builder
          */
         public Builder withDefaultApplySniperToRotate(boolean applySniperToRotate) {
@@ -246,16 +246,16 @@ public class SwerveTeleopConfig {
          */
         public SwerveTeleopConfig build() {
             return new SwerveTeleopConfig(
-                    Utils.pref(prefix+"/Deadband", defaultDeadband),
-                    Utils.pref(prefix+"/Exponent", defaultExponent),
-                    Utils.pref(prefix+"/MaxFeetPerSec", defaultMaxTranslateSpeed),
-                    Utils.pref(prefix+"/MaxDegreesPerSec", defaultMaxRotateSpeed),
-                    Utils.pref(prefix+"/TurboFactor", defaultTurboFactor),
-                    Utils.pref(prefix+"/SniperFactor", defaultSniperFactor),
-                    Utils.pref(prefix+"/ApplySniperToRotate?", defaultApplySniperToRotate),
-                    Utils.pref(prefix+"/ApplySlew?", defaultApplySlew),
-                    Utils.pref(prefix+"/SlewRate", defaultSlewRate),
-                    Utils.pref(prefix+"/DriverRelative?", defaultDriverRelative));
+                    HawkUtils.pref(prefix+"/Deadband", defaultDeadband),
+                    HawkUtils.pref(prefix+"/Exponent", defaultExponent),
+                    HawkUtils.pref(prefix+"/MaxFeetPerSec", defaultMaxTranslateSpeed),
+                    HawkUtils.pref(prefix+"/MaxDegreesPerSec", defaultMaxRotateSpeed),
+                    HawkUtils.pref(prefix+"/TurboFactor", defaultTurboFactor),
+                    HawkUtils.pref(prefix+"/SniperFactor", defaultSniperFactor),
+                    HawkUtils.pref(prefix+"/ApplySniperToRotate?", defaultApplySniperToRotate),
+                    HawkUtils.pref(prefix+"/ApplySlew?", defaultApplySlew),
+                    HawkUtils.pref(prefix+"/SlewRate", defaultSlewRate),
+                    HawkUtils.pref(prefix+"/DriverRelative?", defaultDriverRelative));
         }
     }
 }

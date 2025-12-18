@@ -1,4 +1,4 @@
-package robohawk.util.swerve;
+package robohawk.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -7,7 +7,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import robohawk.util.Utils;
+import robohawk.util.HawkUtils;
 
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 /**
  * Supplier for ChassisSpeeds that processes stick input and provides
- * several useful options:
+ * several useful options that we wind up using year over year:
  * <ul>
  *
  *     <li>Max translate/rotate speed (to convert 0.0 - 1.0 values to
@@ -36,7 +36,8 @@ import java.util.function.Supplier;
  *     to 0 if they release the joystick)</li>
  *
  *     <li>"Driver relative" speeds, so that pushing the joystick away
- *     from the driver always sends the robot away from the driver</li>
+ *     from the driver always sends the robot away from the driver
+ *     (see {@link HawkUtils#convertFromDriverRelative(Rotation2d, ChassisSpeeds)})</li>
  *
  *     <li>Publishing mode, input and speed to SmartDashboard</li>
  *
@@ -206,8 +207,11 @@ public class SwerveTeleopSpeedSupplier implements Supplier<ChassisSpeeds> {
                 Units.feetToMeters(lastY),
                 Math.toRadians(lastOmega));
 
+        // convert from driver-relative speeds
         if (config.driverRelative.getAsBoolean()) {
-            speeds = convertFromDriverRelative(headingGetter.get(), speeds);
+            speeds = HawkUtils.convertFromDriverRelative(
+                    headingGetter.get(),
+                    speeds);
         }
 
         return speeds;
@@ -221,12 +225,12 @@ public class SwerveTeleopSpeedSupplier implements Supplier<ChassisSpeeds> {
                 double slew = config.slewRate.getAsDouble();
                 limiterX = new SlewRateLimiter(slew);
                 limiterY = new SlewRateLimiter(slew);
-                Utils.log("[swerve-teleop] enabling slew rate limiting @ %.2f", slew);
+                HawkUtils.log("[swerve-teleop] enabling slew rate limiting @ %.2f", slew);
             }
         } else if (limiterX != null) {
             limiterX = null;
             limiterY = null;
-            Utils.log("[swerve-teleop] disabling slew rate limiting");
+            HawkUtils.log("[swerve-teleop] disabling slew rate limiting");
         }
     }
 
@@ -252,44 +256,6 @@ public class SwerveTeleopSpeedSupplier implements Supplier<ChassisSpeeds> {
         input = MathUtil.applyDeadband(input, config.deadband.getAsDouble());
         input = Math.copySign(Math.pow(input, config.exponent.getAsDouble()), input);
         return input;
-    }
-
-    /*
-     * What we usually call "field relative" is actually "driver relative".
-     * Converting speeds from driver relative to robot relative involves
-     * two translations - one based on the driver's POV and another based on
-     * how the robot is oriented.
-     */
-    private ChassisSpeeds convertFromDriverRelative(Rotation2d currentHeading,
-                                                    ChassisSpeeds incomingSpeeds) {
-
-        // incoming speeds are interpreted like so:
-        //   +X goes away from the driver
-        //   +Y goes to the driver's left
-        ChassisSpeeds fieldRelativeSpeeds;
-
-        // if the driver is on the blue alliance, they are looking
-        // at the field "normally" - so going away from them is
-        // also +X on the field
-        if (Utils.isBlueAlliance()) {
-            fieldRelativeSpeeds = incomingSpeeds;
-        }
-
-        // if they're red, they are actually looking at the field from
-        // the opposite side (so going away from them is -X on the
-        // field, and to their left is -Y)
-        else {
-            fieldRelativeSpeeds = new ChassisSpeeds(
-                    -incomingSpeeds.vxMetersPerSecond,
-                    -incomingSpeeds.vyMetersPerSecond,
-                    incomingSpeeds.omegaRadiansPerSecond);
-        }
-
-        // to get to fully robot-relative speeds, we need to consider
-        // the current heading of the robot
-        return ChassisSpeeds.fromFieldRelativeSpeeds(
-                fieldRelativeSpeeds,
-                currentHeading);
     }
 
     /**
