@@ -1,4 +1,4 @@
-package robohawk.swerve;
+package robohawk.util.swerve;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import robohawk.swerve.SwervePoseCalculator.PoseType;
+import robohawk.util.swerve.SwervePoseCalculator.PoseType;
 import robohawk.util.HawkUtils;
 
 import java.util.Arrays;

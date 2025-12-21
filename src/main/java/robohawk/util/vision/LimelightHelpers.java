@@ -1,4 +1,4 @@
-package robohawk.vision;
+package robohawk.util.vision;
 
 // ===========================================================================================
 // THIS CLASS WAS COPIED VERBATIM FROM HERE

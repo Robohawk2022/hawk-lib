@@ -1,4 +1,4 @@
-package robohawk.swerve;
+package robohawk.util.swerve;
 
 import robohawk.util.HawkUtils;
 

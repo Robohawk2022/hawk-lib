@@ -1,10 +1,10 @@
-package robohawk.motion;
+package robohawk.util.motion;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import robohawk.motion.SCurveProfile.Constraints;
+import robohawk.util.motion.SCurveProfile.Constraints;
 import robohawk.util.HawkUtils;
 
 import java.util.Objects;

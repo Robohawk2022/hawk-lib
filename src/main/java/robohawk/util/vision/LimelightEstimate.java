@@ -1,7 +1,7 @@
-package robohawk.vision;
+package robohawk.util.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import robohawk.vision.LimelightHelpers.PoseEstimate;
+import robohawk.util.vision.LimelightHelpers.PoseEstimate;
 
 /**
  * Used to capture results from Limelight pose estimation. Depending on the

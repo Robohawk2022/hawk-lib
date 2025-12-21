@@ -1,16 +1,16 @@
-package robohawk.vision;
+package robohawk.util.vision;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import robohawk.util.HawkUtils;
-import robohawk.vision.LimelightHelpers.PoseEstimate;
+import robohawk.util.vision.LimelightHelpers.PoseEstimate;
 
 import java.util.function.DoubleSupplier;
 
-import static robohawk.vision.LimelightEstimate.Status.NO_TAG;
-import static robohawk.vision.LimelightEstimate.Status.SPINNING;
-import static robohawk.vision.LimelightEstimate.Status.SUCCESS;
-import static robohawk.vision.LimelightEstimate.Status.TOO_AMBIGUOUS;
-import static robohawk.vision.LimelightEstimate.Status.TOO_FAR;
+import static robohawk.util.vision.LimelightEstimate.Status.NO_TAG;
+import static robohawk.util.vision.LimelightEstimate.Status.SPINNING;
+import static robohawk.util.vision.LimelightEstimate.Status.SUCCESS;
+import static robohawk.util.vision.LimelightEstimate.Status.TOO_AMBIGUOUS;
+import static robohawk.util.vision.LimelightEstimate.Status.TOO_FAR;
 
 /**
  * Wrapper for a Limelight camera. Provides access to targeting and pose

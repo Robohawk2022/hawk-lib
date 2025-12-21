@@ -1,4 +1,4 @@
-package robohawk.motion;
+package robohawk.util.motion;
 
 import edu.wpi.first.math.util.Units;
 

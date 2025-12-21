@@ -1,4 +1,4 @@
-package robohawk.vision;
+package robohawk.util.vision;
 
 /**
  * <p>This represents information about an in-view Limelight target. It is
