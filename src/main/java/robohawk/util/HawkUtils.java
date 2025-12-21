@@ -271,7 +271,7 @@ public class HawkUtils {
     /**
      * @param speeds chassis speeds
      * @param tolerance a {@link DoubleSupplier} that will return a tolerance
-     *                 in feet per second
+     *                  in feet per second
      * @return true if the supplied speeds include an XY translation
      * greater than the supplied tolerance (in feet per second) in
      * either direction
@@ -361,9 +361,9 @@ public class HawkUtils {
     /**
      * @param name the name of a configuration property
      * @param defaultValue a default value for the property
-     * @return a {@link BooleanSupplier} providing access to the specified configuration
-     * preference (this also has the side effect of saving the value, if it's not already
-     * persisted on the robot)
+     * @return a {@link BooleanSupplier} providing access to the specified
+     * configuration preference (see {@link #forceOverwriteRobotConfig()} for
+     * more on what happens to the default value)
      */
     public static BooleanSupplier pref(String name, boolean defaultValue) {
         log("[util] registering pref %s = %s", name, defaultValue);
@@ -378,9 +378,9 @@ public class HawkUtils {
     /**
      * @param name the name of a configuration property
      * @param defaultValue a default value for the property
-     * @return a {@link DoubleSupplier} providing access to the specified configuration
-     * preference (this also has the side effect of saving the value, if it's not already
-     * persisted on the robot)
+     * @return a {@link DoubleSupplier} providing access to the specified
+     * configuration preference (see {@link #forceOverwriteRobotConfig()} for
+     * more on what happens to the default value)
      */
     public static DoubleSupplier pref(String name, double defaultValue) {
         log("[util] registering pref %s = %.2f", name, defaultValue);

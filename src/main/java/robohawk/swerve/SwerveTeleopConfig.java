@@ -6,19 +6,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 /**
- * Configuration properties for swerve teleop. Properties are managed with
- * {@link edu.wpi.first.wpilibj.Preferences}, which means the following:
- * <ul>
- *
- *     <li>The current value is exposed via a {@link DoubleSupplier} so it
- *     will update immediately if the corresponding property is changed in
- *     the dashboard.</li>
- *
- *     <li>The values configured in the {@link Builder} are defaults; if
- *     someone has changed them on the RoboRIO the updated value will be
- *     used instead.</li>
- *
- * </ul>
+ * Configuration properties for swerve teleop.
  */
 public class SwerveTeleopConfig {
 
@@ -89,10 +77,9 @@ public class SwerveTeleopConfig {
     }
 
     /**
-     * Builder class for configuration. Defaults are based on multi-year
-     * experience and preferences of Team 3373. Upon constructing the
-     * {@link SwerveTeleopConfig}, preferences will be registered with the
-     * following names:
+     * Builder class for configuration. When you use this, the property
+     * values will be managed via WPILib Preferences. Preferences will be
+     * registered with the following names:
      * <ul>
      *     <li><pre>${prefix}/Deadband</pre> - default 0.1</li>
      *     <li><pre>${prefix}/Exponent</pre> - default 2.0</li>
@@ -105,6 +92,8 @@ public class SwerveTeleopConfig {
      *     <li><pre>${prefix}/SlewRate</pre> - default 1.0</li>
      *     <li><pre>${prefix}/DriverRelative?</pre> - default true</li>
      * </ul>
+     * See {@link HawkUtils#pref(String, double)} for some discussion of how
+     * preferences work.
      */
     public static class Builder {
 
