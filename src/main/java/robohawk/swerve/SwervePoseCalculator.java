@@ -85,7 +85,6 @@ public class SwervePoseCalculator {
         this.latestOdometryPose = initialPose;
         this.latestFusedPose = initialPose;
         this.latestVisionTimestamp = Double.NaN;
-
     }
 
     /**

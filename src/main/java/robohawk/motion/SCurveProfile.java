@@ -2,6 +2,9 @@ package robohawk.motion;
 
 import edu.wpi.first.math.util.Units;
 
+import java.util.Objects;
+import java.util.function.DoubleSupplier;
+
 /**
  * <p>Provides a one-dimensional "motion profile" - calculates position and
  * velocity over time respecting constraints on velocity, acceleration and
@@ -23,70 +26,45 @@ public class SCurveProfile {
      * units are used for velocity / acceleration, but they have to agree with
      * one another.
      *
-     * @param maxVelocity velocity in units per second
-     * @param maxAcceleration acceleration in units per second squared
-     * @param rampTime ramp time in seconds
+     * @param maxVelocity supplier for max velocity in units per second
+     * @param maxAcceleration supplier for max acceleration in units per second squared
+     * @param rampTime supplier for ramp time in seconds
      */
-    public record Constraints(double maxVelocity,
-                              double maxAcceleration,
-                              double rampTime) {
-
-        /**
-         * Creates a {@link Constraints}
-         * @param maxVelocity velocity in units per second
-         * @param maxAcceleration acceleration in units per second squared
-         * @param rampTime ramp time in seconds
-         * @throws IllegalArgumentException if any parameter is negative
-         */
-        public Constraints(
-                double maxVelocity,
-                double maxAcceleration,
-                double rampTime) {
-            if (maxVelocity < 0) {
-                throw new IllegalArgumentException("maxVelocity cannot be negative");
-            }
-            if (maxAcceleration < 0) {
-                throw new IllegalArgumentException("maxAcceleration cannot be negative");
-            }
-            if (rampTime < 0) {
-                throw new IllegalArgumentException("rampTime cannot be negative");
-            }
-            this.maxVelocity = maxVelocity;
-            this.maxAcceleration = maxAcceleration;
-            this.rampTime = rampTime;
-        }
+    public record Constraints(DoubleSupplier maxVelocity,
+                              DoubleSupplier maxAcceleration,
+                              DoubleSupplier rampTime) {
 
         /**
          * Converts supplied constraints to meters
-         * @param maxVelocity max velocity in feet per second
-         * @param maxAcceleration max acceleration in feet per second squared
-         * @param rampTime ramp time in seconds
+         * @param maxVelocity supplier for max velocity in feet per second
+         * @param maxAcceleration supplier for max acceleration in feet per second squared
+         * @param rampTime supplier for ramp time in seconds
          * @return new constraints expressed in meters and seconds
          */
         public static Constraints feetToMeters(
-                double maxVelocity,
-                double maxAcceleration,
-                double rampTime) {
+                DoubleSupplier maxVelocity,
+                DoubleSupplier maxAcceleration,
+                DoubleSupplier rampTime) {
             return new Constraints(
-                    Units.feetToMeters(maxVelocity),
-                    Units.feetToMeters(maxAcceleration),
+                    () -> Units.feetToMeters(maxVelocity.getAsDouble()),
+                    () -> Units.feetToMeters(maxAcceleration.getAsDouble()),
                     rampTime);
         }
 
         /**
          * Converts supplied constraints to radians
-         * @param maxVelocity max velocity in degrees per second
-         * @param maxAcceleration max acceleration in degrees per second squared
-         * @param rampTime ramp time in seconds
+         * @param maxVelocity supplier for max velocity in degrees per second
+         * @param maxAcceleration supplier for max acceleration in degrees per second squared
+         * @param rampTime supplier for ramp time in seconds
          * @return new constraints expressed in radians and seconds
          */
         public static Constraints degreesToRadians(
-                double maxVelocity,
-                double maxAcceleration,
-                double rampTime) {
+                DoubleSupplier maxVelocity,
+                DoubleSupplier maxAcceleration,
+                DoubleSupplier rampTime) {
             return new Constraints(
-                    Units.degreesToRadians(maxVelocity),
-                    Units.degreesToRadians(maxAcceleration),
+                    () -> Units.degreesToRadians(maxVelocity.getAsDouble()),
+                    () -> Units.degreesToRadians(maxAcceleration.getAsDouble()),
                     rampTime);
         }
     }
@@ -99,12 +77,19 @@ public class SCurveProfile {
      * @param velocity velocity in units per second
      * @param acceleration acceleration in units per second squared
      */
-    public record State(double position, double velocity, double acceleration) { }
+    public record State(double position, double velocity, double acceleration) {
 
-    // Constraints on motion
-    final double maxVelocity;
-    final double maxAcceleration;
-    final double rampTime;
+    }
+
+    // Constraints on motion (either stored as suppliers or static values)
+    private final DoubleSupplier maxVelocitySupplier;
+    private final DoubleSupplier maxAccelerationSupplier;
+    private final DoubleSupplier rampTimeSupplier;
+
+    // Current constraint values (read from suppliers in reset())
+    double maxVelocity;
+    double maxAcceleration;
+    double rampTime;
 
     // Motion parameters
     double startPosition;
@@ -131,24 +116,10 @@ public class SCurveProfile {
      * @throws NullPointerException if required parameters are null
      */
     public SCurveProfile(Constraints constraints) {
-        this(constraints.maxVelocity,
-                constraints.maxAcceleration,
-                constraints.rampTime);
-    }
-
-    /**
-     * Creates a new {@link SCurveProfile}
-     *
-     * @param maxVelocity maximum velocity in units per second
-     * @param maxAcceleration maximum acceleration in units per second squared
-     * @param rampTime time in seconds to max acceleration
-     */
-    public SCurveProfile(double maxVelocity,
-                         double maxAcceleration,
-                         double rampTime) {
-        this.maxVelocity = maxVelocity;
-        this.maxAcceleration = maxAcceleration;
-        this.rampTime = rampTime;
+        Objects.requireNonNull(constraints);
+        this.maxVelocitySupplier = constraints.maxVelocity();
+        this.maxAccelerationSupplier = constraints.maxAcceleration();
+        this.rampTimeSupplier = constraints.rampTime();
     }
 
     // =============================================================
@@ -166,6 +137,11 @@ public class SCurveProfile {
      * @param finalPosition the final position of the motion
      */
     public void reset(double startPosition, double startVelocity, double finalPosition) {
+
+        // Re-read constraint values from suppliers
+        this.maxVelocity = maxVelocitySupplier.getAsDouble();
+        this.maxAcceleration = maxAccelerationSupplier.getAsDouble();
+        this.rampTime = rampTimeSupplier.getAsDouble();
 
         this.startPosition = startPosition;
         this.startVelocity = startVelocity;

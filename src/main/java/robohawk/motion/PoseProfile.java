@@ -10,7 +10,9 @@ import robohawk.util.HawkUtils;
 import java.util.Objects;
 
 /**
- *
+ * Calculates a straight-line profile between two separate {@link Pose2d}
+ * instances. This can be used to achieve a target position, or heading, or
+ * both.
  */
 public class PoseProfile {
 
@@ -19,7 +21,8 @@ public class PoseProfile {
     static final double MIN_TRANSLATION = 3.0 / 12.0;
 
     /**
-     * Represents a sample of the profile at a moment in time
+     * Captures the desired position and speed at a moment in time.
+     *
      * @param pose the desired pose at that moment
      * @param speed the desired speed at that moment
      */
@@ -27,14 +30,15 @@ public class PoseProfile {
 
     }
 
-    SCurveProfile translateProfile;
-    SCurveProfile rotateProfile;
+    final SCurveProfile translateProfile;
+    final SCurveProfile rotateProfile;
     Pose2d startPose;
     Pose2d finalPose;
     boolean isRotating;
     boolean isTranslating;
     double cos;
     double sin;
+    double totalTime;
 
     /**
      * Creates a {@link PoseProfile}
@@ -44,19 +48,6 @@ public class PoseProfile {
      */
     public PoseProfile(Constraints translateConstraints,
                        Constraints rotateConstraints) {
-        resetConstraints(translateConstraints, rotateConstraints);
-    }
-
-    /**
-     * Resets the constraints. Use this to update your max speed, acceleration
-     * and/or jerk from configuration.
-     *
-     * @param translateConstraints new constraints (required)
-     * @param rotateConstraints new constraints (required)
-     * @throws IllegalArgumentException if required parameters are null
-     */
-    public void resetConstraints(Constraints translateConstraints,
-                                 Constraints rotateConstraints) {
         Objects.requireNonNull(translateConstraints);
         Objects.requireNonNull(rotateConstraints);
         translateProfile = new SCurveProfile(translateConstraints);
@@ -74,9 +65,10 @@ public class PoseProfile {
 
         Objects.requireNonNull(startPose);
         Objects.requireNonNull(finalPose);
-
         this.startPose = startPose;
         this.finalPose = finalPose;
+
+        totalTime = 0.0;
 
         // if we're rotating, we calculate an "offset" around the circle based
         // on its delta from the starting position - starting at 0 degrees and
@@ -90,6 +82,7 @@ public class PoseProfile {
         isRotating = radians > MIN_ROTATION;
         if (isRotating) {
             rotateProfile.reset(0.0, 0.0, radians);
+            totalTime = Math.max(totalTime, rotateProfile.totalTime());
         }
 
         // if we're translating, we will calculate the distance and angle
@@ -114,6 +107,7 @@ public class PoseProfile {
             sin = angle.getSin();
 
             translateProfile.reset(0.0, 0.0, meters);
+            totalTime = Math.max(totalTime, translateProfile.totalTime());
         }
     }
 
@@ -160,8 +154,6 @@ public class PoseProfile {
      * maximum of the translation time and the rotation time)
      */
     public double totalTime() {
-        return Math.max(
-                translateProfile.totalTime(),
-                rotateProfile.totalTime());
+        return totalTime;
     }
 }
