@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  * starting in the 2024 year and it's way better than just using the
  * dashboard.</p>
  */
-public class DigitBoardPicker implements Supplier<String> {
+public class AutoProgramPicker implements Supplier<String> {
 
     final Map<String,String> options;
     final String [] shortNames;
@@ -28,7 +28,7 @@ public class DigitBoardPicker implements Supplier<String> {
     int which;
 
     /**
-     * Creates a {@link DigitBoardPicker}.
+     * Creates a {@link AutoProgramPicker}.
      *
      * @param name the name in SmartDashboard (if running in simulation)
      * @param options a code/value mapping of options - the codes will be shown
@@ -36,7 +36,7 @@ public class DigitBoardPicker implements Supplier<String> {
      *                max); the values are the names of the corresponding
      *                autonomous programs
      */
-    public DigitBoardPicker(String name, Map<String,String> options) {
+    public AutoProgramPicker(String name, Map<String,String> options) {
 
         this.options = options;
         this.shortNames = options.keySet().toArray(new String[0]);
